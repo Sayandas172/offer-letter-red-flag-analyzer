@@ -189,6 +189,35 @@
     color: var(--verified);
     margin-top: 24px;
   }
+  .company-block {
+    margin-top: 32px;
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+  }
+  .company-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .company-name {
+    font-family: 'Source Serif 4', serif;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .concern-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border: 1px solid;
+  }
+  .concern-badge.yes { color: var(--alert); border-color: var(--alert); }
+  .concern-badge.no { color: var(--verified); border-color: var(--verified); }
+  .company-summary {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+  }
 </style>
 </head>
 <body>
@@ -208,7 +237,7 @@
     <textarea id="offerText" placeholder="Paste the offer letter text here..."></textarea>
     <br>
     <button id="analyzeBtn" onclick="analyzeOffer()">Analyze Offer</button>
-    <div id="loading">Reviewing against case records...</div>
+    <div id="loading">Reviewing against case records and verifying company online...</div>
 
     <div id="resultWrap">
       <div class="verdict-row">
@@ -229,6 +258,15 @@
       </div>
 
       <div class="flags" id="flagsList"></div>
+
+      <div class="company-block" id="companyBlock">
+        <div class="section-title">EXHIBIT B — COMPANY VERIFICATION</div>
+        <div class="company-header">
+          <span class="company-name" id="companyName"></span>
+          <span class="concern-badge" id="concernBadge"></span>
+        </div>
+        <div class="company-summary" id="companySummary"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -311,6 +349,19 @@ function renderResult(data) {
     div.className = 'no-flags';
     div.textContent = 'No red flags identified in this document.';
     flagsList.appendChild(div);
+  }
+
+  const companyBlock = document.getElementById('companyBlock');
+  const cc = data.company_check;
+  if (cc && cc.company_name && cc.company_name.toLowerCase() !== 'unknown') {
+    document.getElementById('companyName').textContent = cc.company_name;
+    const badge = document.getElementById('concernBadge');
+    badge.textContent = cc.found_concerns ? 'CONCERNS FOUND' : 'NO CONCERNS FOUND';
+    badge.className = 'concern-badge ' + (cc.found_concerns ? 'yes' : 'no');
+    document.getElementById('companySummary').textContent = cc.verification_summary || '';
+    companyBlock.style.display = 'block';
+  } else {
+    companyBlock.style.display = 'none';
   }
 
   document.getElementById('resultWrap').style.display = 'block';
