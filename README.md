@@ -44,6 +44,13 @@ Having encountered pay-to-participate scams and other red flags during my own in
 Validated against 50+ real internship/job offer communications personally received — correctly classified 50/50, including a case where the offer letter itself contained no red flags in its text, but was correctly flagged as high-risk after company verification surfaced multiple scam reports and mixed reviews.
 
 During evaluation, one case (a donation-linked stipend from a verified nonprofit) was correctly flagged as unusual but initially over-scored at High risk, the same tier as an outright payment-demanding scam. Added a calibration reference to the knowledge base distinguishing transparent, no-payment-demanded but atypical compensation structures (Medium risk) from active fraud patterns (High risk), improving score proportionality without losing the underlying signal.
+
+## ⚠️ Known Limitations
+
+- OCR-based text extraction (for image-heavy or decoratively-styled PDFs) is supported in local development but not in the deployed production version, since it requires a system-level dependency not available in the current deployment environment.
+- This system analyzes the text of the offer letter/communication provided, plus a live company reputation check. Scams where both the letter text is clean AND the company has no negative public footprint yet (e.g., a brand-new scam operation) may not be caught by either layer alone.
+- Risk scores may vary slightly (typically within 10-15 points) between identical requests, since LLM inference isn't perfectly deterministic even at temperature=0. The risk level classification (Low/Medium/High) is more stable than the exact numeric score.
+
 ## ▶️ Running locally
 
 1. `pip install -r requirements.txt`
