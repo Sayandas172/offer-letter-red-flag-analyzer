@@ -1,8 +1,6 @@
 import os
-from sentence_transformers import SentenceTransformer
 import chromadb
 
-model = SentenceTransformer('all-MiniLM-L6-v2')
 client = chromadb.PersistentClient(path="./vectorstore")
 
 try:
@@ -38,13 +36,10 @@ def load_and_chunk(folder, doc_type):
 
 all_chunks = load_and_chunk("data/redflags", "redflag") + load_and_chunk("data/offers", "legit")
 
-for c in all_chunks:
-    embedding = model.encode(c["text"]).tolist()
-    collection.add(
-        ids=[c["id"]],
-        embeddings=[embedding],
-        documents=[c["text"]],
-        metadatas=[{"source": c["source"], "type": c["type"], "severity": c["severity"]}]
-    )
+ids = [c["id"] for c in all_chunks]
+documents = [c["text"] for c in all_chunks]
+metadatas = [{"source": c["source"], "type": c["type"], "severity": c["severity"]} for c in all_chunks]
+
+collection.add(ids=ids, documents=documents, metadatas=metadatas)
 
 print(f"Ingested {len(all_chunks)} chunks with metadata.")

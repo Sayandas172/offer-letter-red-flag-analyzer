@@ -1,12 +1,10 @@
 import os
 import json
-from sentence_transformers import SentenceTransformer
 import chromadb
 from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
-model = SentenceTransformer('all-MiniLM-L6-v2')
 client = chromadb.PersistentClient(path="./vectorstore")
 collection = client.get_collection("offers")
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
@@ -22,9 +20,8 @@ SOURCE_LABELS = {
 }
 
 def analyze_offer(offer_text):
-    query_embedding = model.encode(offer_text).tolist()
     results = collection.query(
-        query_embeddings=[query_embedding],
+        query_texts=[offer_text],
         n_results=5,
         include=["documents", "metadatas", "distances"]
     )
