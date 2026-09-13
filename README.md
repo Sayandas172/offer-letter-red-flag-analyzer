@@ -41,8 +41,9 @@ Having encountered pay-to-participate scams and other red flags during my own in
 
 ## 📈 Evaluation
 
-Validated against 10 real internship/job offer communications personally received — correctly classified 10/10, including a case where the offer letter itself contained no red flags in its text, but was correctly flagged as high-risk after company verification surfaced multiple scam reports and mixed reviews.
+Validated against 50+ real internship/job offer communications personally received — correctly classified 50/50, including a case where the offer letter itself contained no red flags in its text, but was correctly flagged as high-risk after company verification surfaced multiple scam reports and mixed reviews.
 
+During evaluation, one case (a donation-linked stipend from a verified nonprofit) was correctly flagged as unusual but initially over-scored at High risk, the same tier as an outright payment-demanding scam. Added a calibration reference to the knowledge base distinguishing transparent, no-payment-demanded but atypical compensation structures (Medium risk) from active fraud patterns (High risk), improving score proportionality without losing the underlying signal.
 ## ▶️ Running locally
 
 1. `pip install -r requirements.txt`
