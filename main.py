@@ -4,8 +4,14 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pypdf import PdfReader
 import pdfplumber
+import pypdfium2 as pdfium
+import pytesseract
 import io
 from rag_pipeline import analyze_offer
+import pytesseract
+import platform
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r'D:\ocr_installing\tesseract.exe'
 
 app = FastAPI()
 
@@ -22,6 +28,20 @@ class OfferRequest(BaseModel):
 @app.post("/analyze-offer")
 def analyze(req: OfferRequest):
     return analyze_offer(req.offer_text)
+
+def extract_text_with_ocr(file_bytes):
+    text = ""
+    try:
+        pdf = pdfium.PdfDocument(file_bytes)
+        for page in pdf:
+            bitmap = page.render(scale=2.0)
+            pil_image = bitmap.to_pil()
+            page_text = pytesseract.image_to_string(pil_image)
+            text += page_text + "\n"
+    except Exception as e:
+        print("OCR extraction failed:", e)
+        text = ""
+    return text
 
 @app.post("/analyze-offer-file")
 async def analyze_file(file: UploadFile = File(...)):
@@ -45,6 +65,10 @@ async def analyze_file(file: UploadFile = File(...)):
                     text += page.extract_text() or ""
             except Exception:
                 text = ""
+
+        if not text.strip():
+            print("Falling back to OCR...")
+            text = extract_text_with_ocr(contents)
     else:
         text = contents.decode("utf-8", errors="ignore")
 
@@ -54,7 +78,7 @@ async def analyze_file(file: UploadFile = File(...)):
             "risk_level": "Unknown",
             "flags": [],
             "company_check": {"company_name": "Unknown", "verification_summary": "Could not extract text from this file.", "found_concerns": False},
-            "summary": "Could not extract any readable text from this file. This can happen with heavily stylized or image-based PDFs. Try pasting the text directly instead.",
+            "summary": "Could not extract any readable text from this file, even with OCR. The file may be corrupted or contain no visible text.",
             "confidence": "Low"
         }
 

@@ -7,3 +7,5 @@ python-dotenv
 pypdf
 requests
 pdfplumber
+pypdfium2
+pytesseract
